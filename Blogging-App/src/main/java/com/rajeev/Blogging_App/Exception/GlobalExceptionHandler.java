@@ -3,6 +3,7 @@ package com.rajeev.Blogging_App.Exception;
 import com.rajeev.Blogging_App.Payloads.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,5 +34,12 @@ public class GlobalExceptionHandler {
                           });
         return  new ResponseEntity<>(resp , HttpStatus.BAD_REQUEST);
         }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse> badCredentialException(BadCredentialsException ex){
+        String message = " Invalid Username and Password";
+
+        return new ResponseEntity<>(new ApiResponse(message , false),HttpStatus.UNAUTHORIZED);
+    }
 
 }
