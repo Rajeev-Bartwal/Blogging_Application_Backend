@@ -26,6 +26,8 @@ public class User implements UserDetails{
 
     @Column(name = "user_name", nullable = false,length = 100)
     private String name;
+
+
     private String email;
     private String password;
     private String about;
@@ -46,9 +48,8 @@ public class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorities = roles.stream().map((role ->new SimpleGrantedAuthority(role.getName()))).toList();
 
-        return authorities;
+        return roles.stream().map((role ->new SimpleGrantedAuthority(role.getName()))).toList();
     }
 
     @Override
