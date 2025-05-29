@@ -1,6 +1,7 @@
 package com.rajeev.Blogging_App.Payloads;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.rajeev.Blogging_App.Model.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,6 +38,8 @@ public class UserDTO {
 
     @NotEmpty
     private String about;
+
+    private List<RoleDTO> roles = new ArrayList<>();
 
 //    private List<CommentDTO> comments = new ArrayList<>();
 }

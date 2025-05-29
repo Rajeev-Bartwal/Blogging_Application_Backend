@@ -13,15 +13,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "users")
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
 
-    @ManyToMany(mappedBy = "roles" ,fetch = FetchType.EAGER)
-    List<User> users = new ArrayList<>();
 }

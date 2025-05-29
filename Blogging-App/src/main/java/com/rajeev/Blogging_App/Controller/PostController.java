@@ -7,6 +7,8 @@ import com.rajeev.Blogging_App.Payloads.PostDTO;
 import com.rajeev.Blogging_App.Payloads.PostResponse;
 import com.rajeev.Blogging_App.Services.ImageService;
 import com.rajeev.Blogging_App.Services.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -26,6 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/")
+@Tag(name = "Post Api's" , description = "Create , View , Update ,Delete , upload Image of a post ")
 public class PostController {
 
     @Autowired
@@ -41,12 +44,13 @@ public class PostController {
     private ModelMapper mod;
 
     @PostMapping("/user/{userId}/category/{categoryId}/posts")
+    @Operation(summary = "For creating a post {send post in text , and image as multipartFile} send userId,categoryId")
     public ResponseEntity<PostDTO> createPost(@RequestParam(value = "post",required = true) String post,
                                               @PathVariable Integer userId,
                                               @PathVariable Integer categoryId,
                                               @RequestParam("image") MultipartFile image) throws IOException {
 
-       String imageName = imageService.uploadImage(path,image);
+        String imageName = imageService.uploadImage(path,image);
         ObjectMapper obj = new ObjectMapper();
         PostDTO postDto = obj.readValue( post,PostDTO.class);
         System.out.println(postDto.getContent());
@@ -58,6 +62,7 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}/posts")
+    @Operation(summary = "for getting all posts of a particular User")
     public ResponseEntity<PostResponse> getAllPostsByUser(
             @PathVariable Integer userId,
             @RequestParam(value = "pageNumber" ,defaultValue = AppConstants.PAGE_NO , required = false) Integer pageNumber,
@@ -70,6 +75,7 @@ public class PostController {
     }
 
     @GetMapping("/category/{categoryId}/posts")
+    @Operation(summary = "for getting all posts of a particular category ")
     public ResponseEntity<PostResponse> getAllPostsByCategories(
             @PathVariable Integer categoryId,
             @RequestParam(value = "pageNumber" ,defaultValue = AppConstants.PAGE_NO , required = false) Integer pageNumber,
@@ -81,6 +87,7 @@ public class PostController {
     }
 
     @GetMapping("/posts")
+    @Operation(summary = "For getting all the posts")
     public ResponseEntity<PostResponse> getAllPosts(
             @RequestParam(value = "pageNumber" ,defaultValue = AppConstants.PAGE_NO , required = false) Integer pageNumber,
             @RequestParam(value = "pageSize" ,defaultValue = AppConstants.PAGE_SIZE , required = false) Integer pageSize,
@@ -91,17 +98,20 @@ public class PostController {
     }
 
     @GetMapping("/posts/{postId}")
+    @Operation(summary = "for getting a post by id")
     public ResponseEntity<PostDTO> getPostById(@PathVariable Integer postId){
         return new ResponseEntity<>(postService.getPostById(postId),HttpStatus.FOUND);
     }
 
     @DeleteMapping("/posts/{postId}")
+    @Operation(summary = "for deleting a particular post by id")
     public ResponseEntity<ApiResponse> deletePost(@PathVariable Integer postId){
         postService.deletePost(postId);
         return new ResponseEntity<>(new ApiResponse("Post Deleted SuccessFully ", true),HttpStatus.OK);
     }
 
     @PutMapping("/posts/{postId}")
+    @Operation(summary = "for updating a post")
     public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody PostDTO postDto,
                                               @PathVariable Integer postId){
 
@@ -109,12 +119,14 @@ public class PostController {
     }
 
     @GetMapping("/posts/search/{keywords}")
+    @Operation(summary = "for searching a post")
     public ResponseEntity<List<PostDTO>> searchPost(@PathVariable String keywords){
 
         return new ResponseEntity<>(postService.searchPostsByTitle(keywords) , HttpStatus.FOUND);
     }
 
     @PostMapping("/post/image/upload/{postId}")
+    @Operation(summary = "For uploading/updating image of a particular post")
     public ResponseEntity<PostDTO> uploadImage(@RequestParam(value ="image") MultipartFile image,
                                                      @PathVariable Integer postId) throws IOException {
         String imageName = imageService.uploadImage(path,image);
@@ -126,6 +138,7 @@ public class PostController {
     }
 
     @GetMapping(value = "post/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @Operation(summary = "for getting the image of a post")
     public ResponseEntity<?> serveImage(@PathVariable String imageName,
                                         HttpServletResponse response) throws IOException {
         InputStream image = imageService.getImage(path , imageName);

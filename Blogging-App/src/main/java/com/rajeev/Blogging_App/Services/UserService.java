@@ -9,6 +9,8 @@ import java.util.*;
 @Service
 public interface UserService {
 
+    UserDTO registerNewUser(UserDTO userDto);
+
     UserDTO createUser(UserDTO user);
 
     UserDTO updateUser(UserDTO user,Integer userId);

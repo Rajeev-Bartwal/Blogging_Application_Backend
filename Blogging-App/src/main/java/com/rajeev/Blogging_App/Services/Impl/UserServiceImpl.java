@@ -1,13 +1,17 @@
 package com.rajeev.Blogging_App.Services.Impl;
 
+import com.rajeev.Blogging_App.Configuration.AppConstants;
 import com.rajeev.Blogging_App.Exception.ResourceNotFoundException;
+import com.rajeev.Blogging_App.Model.Role;
 import com.rajeev.Blogging_App.Model.User;
 import com.rajeev.Blogging_App.Payloads.UserDTO;
+import com.rajeev.Blogging_App.Repository.RoleRepo;
 import com.rajeev.Blogging_App.Repository.UserRepo;
 import com.rajeev.Blogging_App.Services.UserService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,13 +27,33 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepo roleRepo;
+
+    @Override
+    public UserDTO registerNewUser(UserDTO userDto) {
+
+        User user = modelMapper.map(userDto , User.class);
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Role role = roleRepo.findById(AppConstants.NORMAL_ROLE).get();
+        user.getRoles().add(role);
+
+        return modelMapper.map(userRepo.save(user) , UserDTO.class);
+    }
+
     @Override
     public UserDTO createUser(UserDTO userDto) {
 
-        User user = userDtoToUser(userDto);
+//        User user = userDtoToUser(userDto);
+        User user = modelMapper.map(userDto , User.class);
         User savedUser = userRepo.save(user);
 
-        return  userToUserDTO(savedUser);
+        return  modelMapper.map(savedUser , UserDTO.class);
     }
 
     @Override
@@ -43,57 +67,30 @@ public class UserServiceImpl implements UserService {
         oldUser.setAbout(userDto.getAbout());
 
         User updatedUser = userRepo.save(oldUser);
-        return userToUserDTO(updatedUser);
+        return modelMapper.map(updatedUser , UserDTO.class);
     }
 
     @Override
     public UserDTO getUserById(Integer userId) {
         User user =  userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user" ,"Id" , userId));
-        return  userToUserDTO(user);
+        return  modelMapper.map(user , UserDTO.class);
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
         List<User> users =  userRepo.findAll();
 
-        return users.stream().map(this::userToUserDTO).collect(Collectors.toList());
+//        return users.stream().map(this::userToUserDTO).collect(Collectors.toList())
+          return  users.stream().map(user -> modelMapper.map(user, UserDTO.class)).toList();
     }
 
     @Override
     public void deleteUser(Integer userId) {
-        userRepo.deleteById(userId);
-    }
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user" ,"userId" , userId));
 
-    private User userDtoToUser(UserDTO userDTO){
+        user.getRoles().clear();
+        userRepo.save(user);
 
-//   using ModelMapper
-        User user = modelMapper.map(userDTO , User.class);
-
-
-
-//        Converting The UsrDto to USer Manually.
-//        user.setId(userDTO.getId());
-//        user.setName(userDTO.getName());
-//        user.setEmail(userDTO.getEmail());
-//        user.setAbout(userDTO.getAbout());
-//        user.setPassword(userDTO.getPassword());
-
-        return user;
-    }
-
-    public  UserDTO userToUserDTO(User user){
-
-//   using ModelMapper
-        UserDTO userDto =  modelMapper.map(user , UserDTO.class);
-
-
-//        Converting the user to USerDTo manually
-//        userDto.setId(user.getId());
-//        userDto.setName(user.getName());
-//        userDto.setEmail(user.getEmail());
-//        userDto.setAbout(user.getAbout());
-//        userDto.setPassword(user.getPassword());
-
-        return  userDto;
+        userRepo.delete(user);
     }
 }
