@@ -29,13 +29,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 public class SecurityConfig{
 
-    public static final String[] PUBLIC_URL = {
-      "/api/auth/**",
-      "/v3/api-docs/**",
-      "/swagger-ui/**",
-      "/webjars/**",
-      "swagger-ui.html"
-    };
     @Autowired
     private CustomUserDetailService customUserDetailService;
 
