@@ -9,6 +9,7 @@ import com.rajeev.Blogging_App.Security.JwtService;
 import com.rajeev.Blogging_App.Services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class  AuthController{
     //User Login
     @Operation(summary = "After Registration Login By UserName(Email) and Password for getting the JWT Token")
     @PostMapping("/login")
-    public ResponseEntity<?> createToken(@RequestBody JWTAuthRequest jwtAuthRequest) throws Exception{
+    public ResponseEntity<?> createToken(@Valid @RequestBody JWTAuthRequest jwtAuthRequest) throws Exception{
 
         try {
             Authentication authentication =
@@ -62,9 +63,9 @@ public class  AuthController{
 
 
     //Register new User.
-    @Operation(summary = "Before Login send user details Like(name , email , password , about & role will be assigned automatically(Don't sen role))")
+    @Operation(summary = "Before Login send user details Like(name , email , password , about & role will be assigned automatically(Don't send role and the user_Id))")
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDto){
+    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody UserDTO userDto){
         UserDTO user = userService.registerNewUser(userDto);
 
         return new ResponseEntity<>(user , HttpStatus.CREATED);

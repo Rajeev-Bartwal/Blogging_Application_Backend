@@ -33,6 +33,4 @@ public class UserDTO {
     private String about;
 
     private List<RoleDTO> roles = new ArrayList<>();
-
-//    private List<CommentDTO> comments = new ArrayList<>();
 }
