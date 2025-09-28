@@ -1,14 +1,15 @@
 package com.rajeev.Blogging_App.Payloads;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -33,4 +34,10 @@ public class UserDTO {
     private String about;
 
     private List<RoleDTO> roles = new ArrayList<>();
+
+    @JsonIgnore
+    public String getPassword() {
+        return this.password;
+    }
+
 }
