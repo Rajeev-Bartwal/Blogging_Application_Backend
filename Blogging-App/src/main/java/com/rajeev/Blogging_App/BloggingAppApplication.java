@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Objects;
 
 @SpringBootApplication
 public class BloggingAppApplication implements CommandLineRunner {
@@ -21,18 +22,20 @@ public class BloggingAppApplication implements CommandLineRunner {
 	private RoleRepo roleRepo;
 
 	public static void main(String[] args) {
-//
-//        System.out.println(new java.io.File("C:/Spring_Project/Blogging-App/Blogging-App/.env").exists());
+
 //        Dotenv dotenv = Dotenv.configure()
 //                .directory("C:/Spring_Project/Blogging-App/Blogging-App/")
 //                .filename(".env")
 //                .load();
-//        System.out.println(dotenv.get("DB_PASSWORD"));
-//        System.setProperty("DB_PASSWORD" , dotenv.get("DB_PASSWORD"));
-//        System.setProperty("DB_URL" , dotenv.get("DB_URL"));
-//        System.setProperty("DB_USER" , dotenv.get("DB_USER"));
+//        System.setProperty("DB_PASSWORD" , Objects.requireNonNull(dotenv.get("DB_PASSWORD")));
+//        System.setProperty("DB_URL" , Objects.requireNonNull(dotenv.get("DB_URL")));
+//        System.setProperty("DB_USER" , Objects.requireNonNull(dotenv.get("DB_USER")));
+//        System.setProperty("CLOUDINARY_CLOUD_NAME", Objects.requireNonNull(dotenv.get("CLOUDINARY_CLOUD_NAME")));
+//        System.setProperty("CLOUDINARY_API_KEY", Objects.requireNonNull(dotenv.get("CLOUDINARY_API_KEY")));
+//        System.setProperty("CLOUDINARY_API_SECRET", Objects.requireNonNull(dotenv.get("CLOUDINARY_API_SECRET")));
+//
 
-		SpringApplication.run(BloggingAppApplication.class, args);
+        SpringApplication.run(BloggingAppApplication.class, args);
 	}
 
 	@Bean

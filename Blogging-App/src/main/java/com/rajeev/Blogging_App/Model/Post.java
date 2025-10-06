@@ -24,8 +24,9 @@ public class Post {
     private String title;
 
 
-    @Size(min = 25,message = "Content should be min of 10 words")
-    private  String content;
+    @Lob
+    @Size(min = 25, message = "Content should be min of 25 characters")
+    private String content;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date addedDate;

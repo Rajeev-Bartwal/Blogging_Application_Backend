@@ -44,21 +44,19 @@ public class PostController {
     private ModelMapper mod;
 
     @PostMapping("/user/{userId}/category/{categoryId}/posts")
-    @Operation(summary = "For creating a post {send post in text , and image as multipartFile} send userId,categoryId")
-    public ResponseEntity<PostDTO> createPost(@RequestParam(value = "post",required = true) String post,
-                                              @PathVariable Integer userId,
-                                              @PathVariable Integer categoryId,
-                                              @RequestParam("image") MultipartFile image) throws IOException {
+    @Operation(summary = "For creating a post {send postDTO , and image as multipartFile} send userId,categoryId")
+    public ResponseEntity<PostDTO> createPost(
+            @Valid @ModelAttribute PostDTO postDto,      // ✅ validation works
+            @PathVariable Integer userId,
+            @PathVariable Integer categoryId,
+            @RequestParam("image") MultipartFile image
+    ) throws IOException {
 
-        String imageName = imageService.uploadImage(path,image);
-        ObjectMapper obj = new ObjectMapper();
-        PostDTO postDto = obj.readValue( post,PostDTO.class);
-        System.out.println(postDto.getContent());
-        System.out.println(postDto.getTitle());
+        String imageName = imageService.uploadImage(image);
         postDto.setImageName(imageName);
 
-       PostDTO savedPost =  postService.createPost(postDto,userId,categoryId,image);
-       return  new ResponseEntity<>(savedPost , HttpStatus.CREATED);
+        PostDTO savedPost = postService.createPost(postDto, userId, categoryId, image);
+        return new ResponseEntity<>(savedPost, HttpStatus.OK);
     }
 
     @GetMapping("/user/{userId}/posts")
@@ -71,7 +69,7 @@ public class PostController {
             @RequestParam(value = "order",defaultValue = AppConstants.ORDER , required = false) String order)
     {
 
-        return new ResponseEntity<>(postService.getAllPostByUser(userId, pageNumber ,  pageSize , sortBy , order) , HttpStatus.FOUND);
+        return new ResponseEntity<>(postService.getAllPostByUser(userId, pageNumber ,  pageSize , sortBy , order) , HttpStatus.OK);
     }
 
     @GetMapping("/category/{categoryId}/posts")
@@ -83,7 +81,7 @@ public class PostController {
             @RequestParam(value = "sortBy" ,defaultValue = AppConstants.SORT_BY , required = false) String sortBy,
             @RequestParam(value = "order",defaultValue = AppConstants.ORDER , required = false) String order){
 
-        return new ResponseEntity<>(postService.getAllPostByCategory(categoryId,pageNumber,pageSize,sortBy,order) , HttpStatus.FOUND);
+        return new ResponseEntity<>(postService.getAllPostByCategory(categoryId,pageNumber,pageSize,sortBy,order) , HttpStatus.OK);
     }
 
     @GetMapping("/posts")
@@ -94,13 +92,13 @@ public class PostController {
             @RequestParam(value = "sortBy" ,defaultValue = AppConstants.SORT_BY , required = false) String sortBy,
             @RequestParam(value = "order",defaultValue = AppConstants.ORDER , required = false) String order){
 
-        return new ResponseEntity<PostResponse>((postService.getAllPosts( pageNumber ,  pageSize , sortBy , order)), HttpStatus.FOUND);
+        return new ResponseEntity<PostResponse>((postService.getAllPosts( pageNumber ,  pageSize , sortBy , order)), HttpStatus.OK);
     }
 
     @GetMapping("/posts/{postId}")
     @Operation(summary = "for getting a post by id")
     public ResponseEntity<PostDTO> getPostById(@PathVariable Integer postId){
-        return new ResponseEntity<>(postService.getPostById(postId),HttpStatus.FOUND);
+        return new ResponseEntity<>(postService.getPostById(postId),HttpStatus.OK);
     }
 
     @DeleteMapping("/posts/{postId}")
@@ -122,28 +120,50 @@ public class PostController {
     @Operation(summary = "for searching a post")
     public ResponseEntity<List<PostDTO>> searchPost(@PathVariable String keywords){
 
-        return new ResponseEntity<>(postService.searchPostsByTitle(keywords) , HttpStatus.FOUND);
+        return new ResponseEntity<>(postService.searchPostsByTitle(keywords) , HttpStatus.OK);
     }
 
+
+
+
+
+
+    //Upload an image
     @PostMapping("/post/image/upload/{postId}")
     @Operation(summary = "For uploading/updating image of a particular post")
-    public ResponseEntity<PostDTO> uploadImage(@RequestParam(value ="image") MultipartFile image,
-                                                     @PathVariable Integer postId) throws IOException {
-        String imageName = imageService.uploadImage(path,image);
+    public ResponseEntity<PostDTO> uploadImage(
+            @RequestParam("image") MultipartFile image,
+            @PathVariable Integer postId) throws IOException {
 
+        // Upload to Cloudinary
+        String imageUrl = imageService.uploadImage(image);
+
+        // Update the post with the image URL
         PostDTO post = postService.getPostById(postId);
-        post.setImageName(imageName);
-        postService.updatePost(post , postId);
-        return new ResponseEntity<>(postService.updatePost(post , postId) , HttpStatus.ACCEPTED);
-    }
+        post.setImageName(imageUrl);
 
-    @GetMapping(value = "post/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
-    @Operation(summary = "for getting the image of a post")
-    public ResponseEntity<?> serveImage(@PathVariable String imageName,
-                                        HttpServletResponse response) throws IOException {
-        InputStream image = imageService.getImage(path , imageName);
-        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-        StreamUtils.copy(image,response.getOutputStream());
-        return ResponseEntity.ok(image);
+        PostDTO updatedPost = postService.updatePost(post, postId);
+        return new ResponseEntity<>(updatedPost, HttpStatus.ACCEPTED);
     }
+//    public ResponseEntity<PostDTO> uploadImage(@RequestParam(value ="image") MultipartFile image,
+//                                                     @PathVariable Integer postId) throws IOException {
+//        String imageName = imageService.uploadImage(path,image);
+//
+//        PostDTO post = postService.getPostById(postId);
+//        post.setImageName(imageName);
+//        postService.updatePost(post , postId);
+//        return new ResponseEntity<>(postService.updatePost(post , postId) , HttpStatus.ACCEPTED);
+//    }
+
+
+//    //For getting the image
+//    @GetMapping(value = "post/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+//    @Operation(summary = "for getting the image of a post")
+//    public ResponseEntity<?> serveImage(@PathVariable String imageName,
+//                                        HttpServletResponse response) throws IOException {
+//        InputStream image = imageService.getImage(path , imageName);
+//        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+//        StreamUtils.copy(image,response.getOutputStream());
+//        return ResponseEntity.ok(image);
+//    }
 }

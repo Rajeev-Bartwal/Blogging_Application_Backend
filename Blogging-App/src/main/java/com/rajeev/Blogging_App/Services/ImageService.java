@@ -10,8 +10,7 @@ import java.io.InputStream;
 @Service
 public interface ImageService {
 
-    String uploadImage(String path , MultipartFile image) throws IOException;
+    String uploadImage(MultipartFile image) throws IOException;
 
-    InputStream getImage(String path, String imageName) throws FileNotFoundException;
 
 }

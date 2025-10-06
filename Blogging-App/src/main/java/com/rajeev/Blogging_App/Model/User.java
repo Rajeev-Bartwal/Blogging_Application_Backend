@@ -38,10 +38,12 @@ public class User implements UserDetails{
 //    @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
 //    List<Comment> comments = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name="user_role",
-    joinColumns = @JoinColumn( name = "user" ,  referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn( name = "role" , referencedColumnName = "id"))
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name="user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
     private List<Role> roles = new ArrayList<>();
 
 

@@ -24,7 +24,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/")
     @Operation(summary = "Creating a category (Only Admin Can create a Category)")
     public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categorydto){
